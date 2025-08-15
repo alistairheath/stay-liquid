@@ -15,7 +15,7 @@ The first component available is the Tab Navigation bar, but over time we will e
 We’re not on npm (yet) but you can still install from GitHub using npm.
 
 ```powershell
-https://github.com/alistairheath/stay-liquid
+npm i https://github.com/alistairheath/stay-liquid
 ```
 
 Then sync it to your Ionic or Capacitor build.
