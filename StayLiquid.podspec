@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = 'Stay Liquid'
+  s.name             = 'StayLiquid'
   s.version          = '0.1.0'
   s.summary          = 'Native Liquid Glass for Ionic & Capacitor Applications'
   s.license          = { :type => 'MIT' }
