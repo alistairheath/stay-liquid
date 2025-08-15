@@ -30,7 +30,7 @@
     "clean": "rimraf dist"
   },
   "peerDependencies": {
-    "@capacitor/core": "^7.4.2"
+    "@capacitor/core": ">=6.0.0"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
