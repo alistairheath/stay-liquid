@@ -1,3 +1,5 @@
+# Stay Liquid: Native Liquid Glass for Ionic & Capacitor Applications
+
 The introduction of Apple’s new Liquid Glass design language poses a challenge for Ionic and Capacitor developers. The native Liquid Glass components use techniques beyond the capabilities of CSS to render the effects of light from the layers behind as they pass through the element.
 
 Stay Liquid works as a way of rendering true Native Liquid Glass components on top of Ionic’s webview. Simply call the plugin from within your Typescript or Javascript code. When an event is registered on the native component, it emits an event which is apssed back to Ionic for you to handle.
