@@ -10,6 +10,8 @@
   "files": [
     "dist",
     "ios",
+    "src",
+    "StayLiquid.podspec",
     "README.md"
   ],
   "exports": {
