@@ -60,6 +60,9 @@ Then in you class add an `ionViewDidEnter()`  method that initiates the Liquid G
         { id: 'data', title: 'Data', systemIcon: 'chart.bar' },
         { id: 'settings', title: 'Settings', systemIcon: 'gear' },
       ],
+      // Optional: Customize tab icon colors
+      selectedIconColor: '#007AFF',      // Blue for selected tab
+      unselectedIconColor: '#8E8E93'     // Gray for unselected tabs
     });
 
     // Native → JS (user taps native tab)
@@ -93,10 +96,71 @@ Then in you class add an `ionViewDidEnter()`  method that initiates the Liquid G
 ```html
 <ion-tabs [class.hidden]="useNativeTabs">
     ... Tabs content here
-</ion-tabs>   
+</ion-tabs>
 ```
 
-## 🔜 Contributing and Further Developments
+## 🎨 Color Customization
+
+Stay Liquid now supports dynamic color customization for tab icons. You can specify custom colors for both selected and unselected tab states using hex or RGBA color formats.
+
+### Supported Color Formats
+
+- **Hex Colors**: `#FF5733`, `#F57` (3-digit), `#FF5733FF` (with alpha)
+- **RGBA Colors**: `rgba(255, 87, 51, 1.0)`, `rgb(255, 87, 51)`
+
+### Configuration Options
+
+```tsx
+await TabsBar.configure({
+  items: [...],
+  // Color customization options
+  selectedIconColor: '#FF5733',           // Hex color for selected tab
+  unselectedIconColor: 'rgba(142, 142, 147, 0.6)', // RGBA color for unselected tabs
+});
+```
+
+### Color Examples
+
+```tsx
+// Example 1: Using hex colors
+await TabsBar.configure({
+  items: [...],
+  selectedIconColor: '#007AFF',      // iOS blue
+  unselectedIconColor: '#8E8E93'     // iOS gray
+});
+
+// Example 2: Using RGBA colors with transparency
+await TabsBar.configure({
+  items: [...],
+  selectedIconColor: 'rgba(0, 122, 255, 1.0)',    // Blue with full opacity
+  unselectedIconColor: 'rgba(142, 142, 147, 0.6)' // Gray with 60% opacity
+});
+
+// Example 3: Using short hex notation
+await TabsBar.configure({
+  items: [...],
+  selectedIconColor: '#F57',    // Expands to #FF5577
+  unselectedIconColor: '#999'   // Expands to #999999
+});
+
+// Example 4: Dynamic color changes
+setTimeout(async () => {
+  await TabsBar.configure({
+    items: [...],
+    selectedIconColor: '#FF3B30',  // Change to red
+    unselectedIconColor: '#C7C7CC' // Change to lighter gray
+  });
+}, 3000);
+```
+
+### Color Validation & Fallbacks
+
+- Invalid color formats will trigger warnings and fall back to system defaults
+- Colors are validated on both TypeScript and iOS sides
+- Color changes apply immediately and persist across tab selections
+- If no colors are specified, the system uses iOS default colors
+
+## 🔜 Contributing and Further Developments
 
 Stay liquid is still a proof-of-concept but the idea of rendering specific native components on top of Ionic’s webview is an idea worth exploring. So far, we have implemented this solely for the tabs navigation bar but I hope to build out the library to contain more components and add more flexibility into how each component can be controlled from within Ionic.
 
