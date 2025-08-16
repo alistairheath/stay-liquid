@@ -1,14 +1,35 @@
 export type BadgeValue = number | "dot" | null;
 
+/** Shape options for image icon containers */
+export type ImageIconShape = "circle" | "square";
+
+/** Size behavior options for image scaling */
+export type ImageIconSize = "cover" | "stretch" | "fit";
+
+/** Image icon configuration object */
+export interface ImageIcon {
+  /** Shape of the icon container */
+  shape: ImageIconShape;
+  /** Image scaling behavior */
+  size: ImageIconSize;
+  /** Image source - either base64 data URI or HTTP/HTTPS URL */
+  image: string;
+}
+
+/** Loading state for remote images */
+export type ImageLoadingState = "loading" | "loaded" | "error";
+
 export interface TabItem {
   /** Unique id you use in your router (e.g., 'home') */
   id: string;
   /** Title shown under the icon (optional if you want icon-only) */
   title?: string;
-  /** SF Symbol name (e.g., 'house', 'sparkles') */
+  /** SF Symbol name (e.g., 'house', 'sparkles') - fallback when imageIcon fails */
   systemIcon?: string;
   /** Or provide an asset name bundled on iOS (selected/unselected are tinted by system) */
   image?: string;
+  /** Enhanced image icon with shape, size, and remote/base64 support */
+  imageIcon?: ImageIcon;
   /** Optional badge number or 'dot' */
   badge?: BadgeValue;
 }

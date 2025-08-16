@@ -160,8 +160,211 @@ setTimeout(async () => {
 - Color changes apply immediately and persist across tab selections
 - If no colors are specified, the system uses iOS default colors
 
+## 🖼️ Image Icon Support
+
+Stay Liquid now supports comprehensive image icons with advanced features including remote URL loading, base64 data URIs, caching, and fallback handling. The new `imageIcon` property provides enhanced control over icon appearance and behavior.
+
+### ImageIcon Structure
+
+```tsx
+interface ImageIcon {
+  shape: 'circle' | 'square';           // Icon container shape
+  size: 'cover' | 'stretch' | 'fit';    // Image scaling behavior
+  image: string;                        // Base64 data URI or HTTPS URL
+}
+```
+
+### Shape Options
+
+- **`circle`**: Circular icon container with rounded edges
+- **`square`**: Square icon container (default)
+
+### Size Options
+
+- **`cover`**: Aspect fill - crops image to fill container while maintaining aspect ratio
+- **`stretch`**: Stretches image to fill container exactly (may distort aspect ratio)
+- **`fit`**: Aspect fit - scales image to fit within container while maintaining aspect ratio
+
+### Image Sources
+
+#### Base64 Data URIs
+```tsx
+await TabsBar.configure({
+  items: [
+    {
+      id: 'home',
+      title: 'Home',
+      systemIcon: 'house', // Fallback if imageIcon fails
+      imageIcon: {
+        shape: 'circle',
+        size: 'cover',
+        image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='
+      }
+    }
+  ]
+});
+```
+
+#### Remote URLs
+```tsx
+await TabsBar.configure({
+  items: [
+    {
+      id: 'profile',
+      title: 'Profile',
+      systemIcon: 'person', // Fallback for network errors
+      imageIcon: {
+        shape: 'circle',
+        size: 'fit',
+        image: 'https://example.com/avatar.png'
+      }
+    }
+  ]
+});
+```
+
+### Supported Image Formats
+
+- **PNG**: `image/png`
+- **JPEG**: `image/jpeg`, `image/jpg`
+- **SVG**: `image/svg+xml`
+- **WebP**: `image/webp`
+
+### Security Features
+
+- **HTTPS Only**: Remote URLs must use HTTPS protocol for security
+- **CORS Handling**: Automatic handling of cross-origin requests
+- **Content-Type Validation**: Server responses are validated for supported image formats
+- **File Size Limits**: Maximum 5MB file size to prevent memory issues
+- **Format Validation**: Only supported image formats are processed
+
+### Performance Features
+
+#### Image Caching
+- Remote images are automatically cached for 24 hours
+- Cache prevents redundant network requests for the same URL
+- Automatic cache cleanup removes expired entries
+
+#### Loading States
+- Smooth transitions between loading, loaded, and error states
+- Automatic fallback to `systemIcon` during loading or on error
+- Non-blocking asynchronous image loading
+
+#### High-DPI Support
+- Automatic scaling for retina and high-DPI displays
+- Optimized rendering for different screen densities
+
+### Error Handling & Fallbacks
+
+The imageIcon system provides robust error handling with automatic fallbacks:
+
+1. **Primary**: `imageIcon` (if specified and loads successfully)
+2. **Secondary**: `systemIcon` (SF Symbol fallback)
+3. **Tertiary**: `image` (bundled asset fallback)
+4. **Final**: Empty placeholder
+
+```tsx
+await TabsBar.configure({
+  items: [
+    {
+      id: 'example',
+      title: 'Example',
+      systemIcon: 'star',        // Fallback if imageIcon fails
+      image: 'bundled-asset',    // Further fallback if systemIcon unavailable
+      imageIcon: {
+        shape: 'circle',
+        size: 'cover',
+        image: 'https://example.com/icon.png' // Primary choice
+      }
+    }
+  ]
+});
+```
+
+### Complete Examples
+
+#### Mixed Icon Types
+```tsx
+await TabsBar.configure({
+  items: [
+    {
+      id: 'home',
+      title: 'Home',
+      systemIcon: 'house',
+      imageIcon: {
+        shape: 'circle',
+        size: 'cover',
+        image: 'https://example.com/home-icon.png'
+      }
+    },
+    {
+      id: 'search',
+      title: 'Search',
+      systemIcon: 'magnifyingglass' // Uses SF Symbol
+    },
+    {
+      id: 'profile',
+      title: 'Profile',
+      image: 'profile-asset', // Uses bundled asset
+      systemIcon: 'person'    // Fallback
+    }
+  ],
+  selectedIconColor: '#007AFF',
+  unselectedIconColor: '#8E8E93'
+});
+```
+
+#### Different Shapes and Sizes
+```tsx
+await TabsBar.configure({
+  items: [
+    {
+      id: 'avatar',
+      title: 'Avatar',
+      systemIcon: 'person.circle',
+      imageIcon: {
+        shape: 'circle',    // Circular avatar
+        size: 'cover',      // Crop to fill
+        image: 'https://example.com/avatar.jpg'
+      }
+    },
+    {
+      id: 'logo',
+      title: 'Logo',
+      systemIcon: 'app',
+      imageIcon: {
+        shape: 'square',    // Square container
+        size: 'fit',        // Fit within bounds
+        image: 'data:image/png;base64,iVBORw0...'
+      }
+    },
+    {
+      id: 'banner',
+      title: 'Banner',
+      systemIcon: 'rectangle',
+      imageIcon: {
+        shape: 'square',    // Square container
+        size: 'stretch',    // Fill exactly (may distort)
+        image: 'https://example.com/banner.png'
+      }
+    }
+  ]
+});
+```
+
+### Best Practices
+
+1. **Always provide fallbacks**: Include `systemIcon` for reliable fallback behavior
+2. **Optimize image sizes**: Use appropriately sized images (30x30px recommended for tab icons)
+3. **Use HTTPS**: Only HTTPS URLs are supported for security
+4. **Consider loading states**: Images load asynchronously, so fallbacks are shown initially
+5. **Test error scenarios**: Verify behavior with invalid URLs or network failures
+6. **Cache considerations**: Remote images are cached, so updates may require cache clearing
+
 ## 🔜 Contributing and Further Developments
 
-Stay liquid is still a proof-of-concept but the idea of rendering specific native components on top of Ionic’s webview is an idea worth exploring. So far, we have implemented this solely for the tabs navigation bar but I hope to build out the library to contain more components and add more flexibility into how each component can be controlled from within Ionic.
+Stay liquid is still a proof-of-concept but the idea of rendering specific native components on top of Ionic's webview is an idea worth exploring. So far, we have implemented this solely for the tabs navigation bar but I hope to build out the library to contain more components and add more flexibility into how each component can be controlled from within Ionic.
+
+The recent addition of comprehensive image icon support demonstrates the potential for rich, native-quality user interfaces while maintaining the flexibility of web technologies.
 
 If you want to help, please feel free to report bugs, ask questions and create new branches.
