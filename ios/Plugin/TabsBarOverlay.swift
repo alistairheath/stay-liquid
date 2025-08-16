@@ -41,7 +41,8 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
         NSLayoutConstraint.activate([
             tabBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tabBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tabBar.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tabBar.topAnchor.constraint(equalTo: view.topAnchor),
+            tabBar.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 
