@@ -29,6 +29,10 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
     private var idToIndex: [String: Int] = [:]
     private let tabBar = UITabBar()
     var onSelected: ((String) -> Void)?
+    
+    // Color configuration
+    private var selectedIconColor: UIColor?
+    private var unselectedIconColor: UIColor?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,9 +55,13 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
     ///   - items: Array of tab items to display
     ///   - initialId: ID of the tab to select initially
     ///   - visible: Whether the tab bar should be visible
+    ///   - selectedIconColor: Optional color for selected tab icons
+    ///   - unselectedIconColor: Optional color for unselected tab icons
     /// - Note: This method should only be called on the main thread
-    func update(items: [TabsBarItem], initialId: String?, visible: Bool) {
+    func update(items: [TabsBarItem], initialId: String?, visible: Bool, selectedIconColor: UIColor? = nil, unselectedIconColor: UIColor? = nil) {
         self.items = items
+        self.selectedIconColor = selectedIconColor
+        self.unselectedIconColor = unselectedIconColor
         idToIndex = Dictionary(uniqueKeysWithValues: items.enumerated().map { ($0.element.id, $0.offset) })
 
         let barItems: [UITabBarItem] = items.enumerated().map { (idx, model) in
@@ -71,6 +79,9 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
             return item
         }
         tabBar.items = barItems
+        
+        // Apply color configuration
+        applyColorConfiguration()
 
         if let initialId, let idx = idToIndex[initialId], let items = tabBar.items, idx < items.count {
             tabBar.selectedItem = items[idx]
@@ -86,6 +97,8 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
     func select(id: String) {
         guard let idx = idToIndex[id], let items = tabBar.items, idx < items.count else { return }
         tabBar.selectedItem = items[idx]
+        // Ensure colors are applied after selection change
+        applyColorConfiguration()
     }
 
     /// Sets a badge value for a specific tab
@@ -111,6 +124,18 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
             item.badgeValue = nil
         }
     }
+    
+    /// Applies the configured colors to the tab bar
+    private func applyColorConfiguration() {
+        // Apply tint colors if configured
+        if let selectedColor = selectedIconColor {
+            tabBar.tintColor = selectedColor
+        }
+        
+        if let unselectedColor = unselectedIconColor {
+            tabBar.unselectedItemTintColor = unselectedColor
+        }
+    }
 
     // MARK: UITabBarDelegate
     /// Called when a tab is selected by the user
@@ -120,6 +145,8 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
     func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         let idx = item.tag
         guard idx >= 0, idx < items.count else { return }
+        // Ensure colors are applied after selection
+        applyColorConfiguration()
         onSelected?(items[idx].id)
     }
 }

@@ -17,6 +17,10 @@ interface TabsBarConfigureOptions {
     initialId?: string;
     /** Show immediately (default true) */
     visible?: boolean;
+    /** Color for the selected tab icon (hex or RGBA format) */
+    selectedIconColor?: string;
+    /** Color for unselected tab icons (hex or RGBA format) */
+    unselectedIconColor?: string;
 }
 interface SelectOptions {
     id: string;
