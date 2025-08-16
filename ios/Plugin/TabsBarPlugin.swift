@@ -61,13 +61,13 @@ public class TabsBarPlugin: CAPPlugin {
     /// - Parameter call: The Capacitor plugin call with configuration options
     @objc func configure(_ call: CAPPluginCall) {
         guard let itemsArr = call.getArray("items", JSObject.self) else {
-            handleError(call, message: "Missing 'items'")
+            self.handleError(call, message: "Missing 'items'")
             return
         }
 
         // JSON → Decodable
         let data = try? JSONSerialization.data(withJSONObject: itemsArr, options: [])
-        guard let data else { handleError(call, message: "Invalid items"); return }
+        guard let data else { self.handleError(call, message: "Invalid items"); return }
         let jsItems: [JSItem]
         do {
             jsItems = try JSONDecoder().decode([JSItem].self, from: data)
@@ -168,7 +168,7 @@ public class TabsBarPlugin: CAPPlugin {
     /// Sets a badge value for a specific tab
     /// - Parameter call: The Capacitor plugin call with the tab ID and badge value
     @objc func setBadge(_ call: CAPPluginCall) {
-        guard let id = call.getString("id") else { handleError(call, message: "Missing 'id'"); return }
+        guard let id = call.getString("id") else { self.handleError(call, message: "Missing 'id'"); return }
         let badgeValue: TabsBarBadge? = {
             if call.getString("value") == "dot" { return .dot }
             if call.getValue("value") is NSNull { return nil }
@@ -181,7 +181,7 @@ public class TabsBarPlugin: CAPPlugin {
         }()
         DispatchQueue.main.async {
             guard let overlay = self.overlayVC else {
-                handleError(call, message: "Overlay not initialized")
+                self.handleError(call, message: "Overlay not initialized")
                 return
             }
             overlay.setBadge(id: id, value: badgeValue)
