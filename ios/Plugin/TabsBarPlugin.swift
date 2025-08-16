@@ -72,20 +72,20 @@ public class TabsBarPlugin: CAPPlugin {
         do {
             jsItems = try JSONDecoder().decode([JSItem].self, from: data)
         } catch {
-            handleError(call, message: "Failed to decode items: \(error)")
+            self.handleError(call, message: "Failed to decode items: \(error)")
             return
         }
 
         // Validate items array is not empty
         guard !jsItems.isEmpty else {
-            handleError(call, message: "Items array cannot be empty")
+            self.handleError(call, message: "Items array cannot be empty")
             return
         }
 
         // Validate each item has a valid ID
         for item in jsItems {
             guard !item.id.isEmpty else {
-                handleError(call, message: "Each item must have a non-empty 'id'")
+                self.handleError(call, message: "Each item must have a non-empty 'id'")
                 return
             }
         }
@@ -117,7 +117,7 @@ public class TabsBarPlugin: CAPPlugin {
             self.ensureOverlay()
             // Ensure overlay is properly initialized before updating
             guard let overlay = self.overlayVC else {
-                handleError(call, message: "Failed to initialize overlay")
+                self.handleError(call, message: "Failed to initialize overlay")
                 return
             }
             overlay.update(items: items, initialId: initialId, visible: visible)
@@ -130,7 +130,7 @@ public class TabsBarPlugin: CAPPlugin {
     @objc func show(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             guard let overlay = self.overlayVC else {
-                handleError(call, message: "Overlay not initialized")
+                self.handleError(call, message: "Overlay not initialized")
                 return
             }
             overlay.view.isHidden = false
@@ -143,7 +143,7 @@ public class TabsBarPlugin: CAPPlugin {
     @objc func hide(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             guard let overlay = self.overlayVC else {
-                handleError(call, message: "Overlay not initialized")
+                self.handleError(call, message: "Overlay not initialized")
                 return
             }
             overlay.view.isHidden = true
@@ -154,10 +154,10 @@ public class TabsBarPlugin: CAPPlugin {
     /// Selects a specific tab by ID
     /// - Parameter call: The Capacitor plugin call with the ID of the tab to select
     @objc func select(_ call: CAPPluginCall) {
-        guard let id = call.getString("id") else { handleError(call, message: "Missing 'id'"); return }
+        guard let id = call.getString("id") else { self.handleError(call, message: "Missing 'id'"); return }
         DispatchQueue.main.async {
             guard let overlay = self.overlayVC else {
-                handleError(call, message: "Overlay not initialized")
+                self.handleError(call, message: "Overlay not initialized")
                 return
             }
             overlay.select(id: id)
