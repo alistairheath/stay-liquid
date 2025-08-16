@@ -6,6 +6,14 @@ export type ImageIconShape = "circle" | "square";
 /** Size behavior options for image scaling */
 export type ImageIconSize = "cover" | "stretch" | "fit";
 
+/** Ring configuration for selected image icons */
+export interface ImageIconRing {
+  /** Whether to show ring around selected image */
+  enabled: boolean;
+  /** Width of the ring in pixels (default: 2.0) */
+  width?: number;
+}
+
 /** Image icon configuration object */
 export interface ImageIcon {
   /** Shape of the icon container */
@@ -14,6 +22,8 @@ export interface ImageIcon {
   size: ImageIconSize;
   /** Image source - either base64 data URI or HTTP/HTTPS URL */
   image: string;
+  /** Optional ring configuration for selected state */
+  ring?: ImageIconRing;
 }
 
 /** Loading state for remote images */

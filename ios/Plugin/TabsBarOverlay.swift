@@ -8,6 +8,16 @@ struct ImageIcon {
     let size: String
     /// Image source - either base64 data URI or HTTP/HTTPS URL
     let image: String
+    /// Optional ring configuration for selected state
+    let ring: ImageIconRing?
+}
+
+/// Represents ring configuration for image icons
+struct ImageIconRing {
+    /// Whether to show ring around selected image
+    let enabled: Bool
+    /// Width of the ring (default: 2.0)
+    let width: Double?
 }
 
 /// Represents a tab item in the tab bar overlay
@@ -81,7 +91,7 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
             applyBadge(model.badge, to: item)
             
             // Load image with priority: imageIcon > systemIcon > image > placeholder
-            loadImageForItem(model, tabBarItem: item)
+          self.loadImageForItem(model, tabBarItem: item)
             
             return item
         }
@@ -135,70 +145,91 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
         /// - Parameters:
         ///   - model: The tab item model
         ///   - tabBarItem: The UITabBarItem to update
-        private func loadImageForItem(_ model: TabsBarItem, tabBarItem: UITabBarItem) {
-            // Priority 1: imageIcon (enhanced image support)
-            if let imageIcon = model.imageIcon {
-                loadImageIcon(imageIcon) { [weak self] image in
-                    DispatchQueue.main.async {
-                        if let image = image {
-                            tabBarItem.image = image
-                            self?.applyColorConfiguration()
-                        } else {
-                            // Fallback to systemIcon if imageIcon fails
-                            self?.loadFallbackImage(for: model, tabBarItem: tabBarItem)
-                        }
-                    }
-                }
-                return
-            }
-            
-            // Priority 2: systemIcon (SF Symbols)
-            if let systemIconName = model.systemIcon {
-                let image = UIImage(systemName: systemIconName) ?? UIImage()
-                tabBarItem.image = image
-                return
-            }
-            
-            // Priority 3: image (bundled asset)
-            if let assetName = model.image {
-                tabBarItem.image = UIImage(named: assetName)
-                return
-            }
-            
-            // Priority 4: placeholder (empty image)
-            tabBarItem.image = UIImage()
-        }
         
-        /// Loads fallback image when imageIcon fails
-        /// - Parameters:
-        ///   - model: The tab item model
-        ///   - tabBarItem: The UITabBarItem to update
-        private func loadFallbackImage(for model: TabsBarItem, tabBarItem: UITabBarItem) {
-            if let systemIconName = model.systemIcon {
-                tabBarItem.image = UIImage(systemName: systemIconName) ?? UIImage()
-            } else if let assetName = model.image {
-                tabBarItem.image = UIImage(named: assetName)
-            } else {
-                tabBarItem.image = UIImage()
-            }
-        }
-        
-        /// Loads an image icon using the ImageUtils
-        /// - Parameters:
-        ///   - imageIcon: The image icon configuration
-        ///   - completion: Completion handler with the loaded image
-        private func loadImageIcon(_ imageIcon: ImageIcon, completion: @escaping (UIImage?) -> Void) {
-            // Convert to JSImageIcon format for ImageUtils
-            let jsImageIcon = JSImageIcon(shape: imageIcon.shape, size: imageIcon.size, image: imageIcon.image)
-            ImageUtils.processImageIcon(jsImageIcon, completion: completion)
-        }
     }
     
+  func loadImageForItem(_ model: TabsBarItem, tabBarItem: UITabBarItem) {
+      // Priority 1: imageIcon (enhanced image support)
+      if let imageIcon = model.imageIcon {
+          loadImageIcon(imageIcon) { [weak self] image in
+              DispatchQueue.main.async {
+                  if let image = image {
+                      // Use original rendering mode to preserve image content
+                      tabBarItem.image = image.withRenderingMode(.alwaysOriginal)
+                      // Store reference to original image for ring rendering
+                      tabBarItem.selectedImage = self?.createSelectedImageWithRing(image, imageIcon: imageIcon)
+                  } else {
+                      // Fallback to systemIcon if imageIcon fails
+                      self?.loadFallbackImage(for: model, tabBarItem: tabBarItem)
+                  }
+              }
+          }
+          return
+      }
+      
+      // Priority 2: systemIcon (SF Symbols)
+      if let systemIconName = model.systemIcon {
+          let image = UIImage(systemName: systemIconName) ?? UIImage()
+          tabBarItem.image = image
+          return
+      }
+      
+      // Priority 3: image (bundled asset)
+      if let assetName = model.image {
+          tabBarItem.image = UIImage(named: assetName)
+          return
+      }
+      
+      // Priority 4: placeholder (empty image)
+      tabBarItem.image = UIImage()
+  }
+  
+  /// Loads fallback image when imageIcon fails
+  /// - Parameters:
+  ///   - model: The tab item model
+  ///   - tabBarItem: The UITabBarItem to update
+  func loadFallbackImage(for model: TabsBarItem, tabBarItem: UITabBarItem) {
+      if let systemIconName = model.systemIcon {
+          tabBarItem.image = UIImage(systemName: systemIconName) ?? UIImage()
+      } else if let assetName = model.image {
+          tabBarItem.image = UIImage(named: assetName)
+      } else {
+          tabBarItem.image = UIImage()
+      }
+  }
+  
+  /// Loads an image icon using the ImageUtils
+  /// - Parameters:
+  ///   - imageIcon: The image icon configuration
+  ///   - completion: Completion handler with the loaded image
+  func loadImageIcon(_ imageIcon: ImageIcon, completion: @escaping (UIImage?) -> Void) {
+      // Convert to JSImageIcon format for ImageUtils
+      let jsImageIcon = JSImageIcon(shape: imageIcon.shape, size: imageIcon.size, image: imageIcon.image, ring: imageIcon.ring)
+      ImageUtils.processImageIcon(jsImageIcon, completion: completion)
+  }
+  
     /// Helper struct to bridge between ImageIcon and JSImageIcon
     private struct JSImageIcon {
         let shape: String
         let size: String
         let image: String
+        let ring: ImageIconRing?
+    }
+    
+    /// Creates a selected image with ring if configured
+    /// - Parameters:
+    ///   - image: The base image
+    ///   - imageIcon: The image icon configuration
+    /// - Returns: Image with ring for selected state, or original image
+    private func createSelectedImageWithRing(_ image: UIImage, imageIcon: ImageIcon) -> UIImage {
+        guard let ring = imageIcon.ring, ring.enabled else {
+            return image.withRenderingMode(.alwaysOriginal)
+        }
+        
+        let ringWidth = CGFloat(ring.width ?? 2.0)
+        let selectedColor = selectedIconColor ?? UIColor.systemBlue
+        
+        return ImageUtils.addRingToImage(image, ringWidth: ringWidth, ringColor: selectedColor)
     }
     
     /// Image utilities for loading and processing images
@@ -364,7 +395,7 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
         private static func applyImageIconStyling(_ image: UIImage?, shape: String, size: String) -> UIImage? {
             guard let image = image else { return nil }
             
-            let targetSize = CGSize(width: 30, height: 30) // Standard tab bar icon size
+            let targetSize = CGSize(width: 24, height: 24) // Smaller icon size with padding
             
             // Apply size behavior
             let resizedImage: UIImage
@@ -421,11 +452,14 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
             return newImage ?? image
         }
         
-        /// Resizes image to fit within target size (aspect fit)
+        /// Resizes image to fit within target size (aspect fit) with padding
         private static func resizeImageAspectFit(_ image: UIImage, targetSize: CGSize) -> UIImage {
             let size = image.size
-            let widthRatio = targetSize.width / size.width
-            let heightRatio = targetSize.height / size.height
+            let padding: CGFloat = 4.0 // Add padding around the image
+            let availableSize = CGSize(width: targetSize.width - padding * 2, height: targetSize.height - padding * 2)
+            
+            let widthRatio = availableSize.width / size.width
+            let heightRatio = availableSize.height / size.height
             let ratio = min(widthRatio, heightRatio)
             
             let newSize = CGSize(width: size.width * ratio, height: size.height * ratio)
@@ -465,6 +499,45 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
         static func clearCache() {
             imageCache.removeAll()
             loadingStates.removeAll()
+        }
+        
+        /// Adds a ring around an image
+        /// - Parameters:
+        ///   - image: The source image
+        ///   - ringWidth: Width of the ring
+        ///   - ringColor: Color of the ring
+        /// - Returns: Image with ring added
+        static func addRingToImage(_ image: UIImage, ringWidth: CGFloat, ringColor: UIColor) -> UIImage {
+            let size = image.size
+            let newSize = CGSize(width: size.width + ringWidth * 2, height: size.height + ringWidth * 2)
+            
+            UIGraphicsBeginImageContextWithOptions(newSize, false, 0)
+            let context = UIGraphicsGetCurrentContext()
+            
+            // Draw the ring
+            context?.setStrokeColor(ringColor.cgColor)
+            context?.setLineWidth(ringWidth)
+            let ringRect = CGRect(x: ringWidth/2, y: ringWidth/2,
+                                width: size.width + ringWidth, height: size.height + ringWidth)
+            
+            if image.size.width == image.size.height {
+                // Circular ring for square images
+                context?.strokeEllipse(in: ringRect)
+            } else {
+                // Rounded rectangle ring for non-square images
+                let cornerRadius = min(size.width, size.height) * 0.1
+                context?.addPath(UIBezierPath(roundedRect: ringRect, cornerRadius: cornerRadius).cgPath)
+                context?.strokePath()
+            }
+            
+            // Draw the original image in the center
+            let imageRect = CGRect(x: ringWidth, y: ringWidth, width: size.width, height: size.height)
+            image.draw(in: imageRect)
+            
+            let newImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+            
+            return newImage?.withRenderingMode(.alwaysOriginal) ?? image
         }
     }
     

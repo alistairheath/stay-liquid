@@ -3,6 +3,13 @@ type BadgeValue = number | "dot" | null;
 type ImageIconShape = "circle" | "square";
 /** Size behavior options for image scaling */
 type ImageIconSize = "cover" | "stretch" | "fit";
+/** Ring configuration for selected image icons */
+interface ImageIconRing {
+    /** Whether to show ring around selected image */
+    enabled: boolean;
+    /** Width of the ring in pixels (default: 2.0) */
+    width?: number;
+}
 /** Image icon configuration object */
 interface ImageIcon {
     /** Shape of the icon container */
@@ -11,6 +18,8 @@ interface ImageIcon {
     size: ImageIconSize;
     /** Image source - either base64 data URI or HTTP/HTTPS URL */
     image: string;
+    /** Optional ring configuration for selected state */
+    ring?: ImageIconRing;
 }
 interface TabItem {
     /** Unique id you use in your router (e.g., 'home') */

@@ -20,8 +20,12 @@ async function configureWithBase64Images() {
         systemIcon: 'house', // Fallback if imageIcon fails
         imageIcon: {
           shape: 'circle',
-          size: 'cover',
-          image: redPixel
+          size: 'fit',
+          image: redPixel,
+          ring: {
+            enabled: true,
+            width: 2.0
+          }
         }
       },
       {
@@ -31,7 +35,11 @@ async function configureWithBase64Images() {
         imageIcon: {
           shape: 'square',
           size: 'fit',
-          image: bluePixel
+          image: bluePixel,
+          ring: {
+            enabled: true,
+            width: 3.0
+          }
         }
       },
       {
@@ -40,8 +48,11 @@ async function configureWithBase64Images() {
         systemIcon: 'person',
         imageIcon: {
           shape: 'circle',
-          size: 'stretch',
-          image: greenPixel
+          size: 'fit',
+          image: greenPixel,
+          ring: {
+            enabled: false
+          }
         }
       }
     ],
@@ -330,6 +341,59 @@ async function demonstrateSecurityFeatures() {
   });
 }
 
+// Example 9: Ring configuration for selected images
+async function configureWithRings() {
+  await TabsBar.configure({
+    items: [
+      {
+        id: 'ring-enabled',
+        title: 'With Ring',
+        systemIcon: 'circle',
+        imageIcon: {
+          shape: 'circle',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/FF5733/FFFFFF?text=R',
+          ring: {
+            enabled: true,
+            width: 2.5
+          }
+        }
+      },
+      {
+        id: 'thick-ring',
+        title: 'Thick Ring',
+        systemIcon: 'square',
+        imageIcon: {
+          shape: 'square',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/007AFF/FFFFFF?text=T',
+          ring: {
+            enabled: true,
+            width: 4.0
+          }
+        }
+      },
+      {
+        id: 'no-ring',
+        title: 'No Ring',
+        systemIcon: 'triangle',
+        imageIcon: {
+          shape: 'circle',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/34C759/FFFFFF?text=N',
+          ring: {
+            enabled: false
+          }
+        }
+      }
+    ],
+    initialId: 'ring-enabled',
+    visible: true,
+    selectedIconColor: '#FF3B30', // This color will be used for the ring
+    unselectedIconColor: '#8E8E93'
+  });
+}
+
 // Export all examples for testing
 export {
   configureWithBase64Images,
@@ -339,7 +403,8 @@ export {
   configureWithErrorHandling,
   demonstrateLoadingStates,
   configureForHighDPI,
-  demonstrateSecurityFeatures
+  demonstrateSecurityFeatures,
+  configureWithRings
 };
 
 // Usage instructions and feature summary
@@ -353,12 +418,17 @@ TabsBar ImageIcon Feature Examples:
 📏 SIZE OPTIONS:
 - "cover": Aspect fill - crops to fill container
 - "stretch": Stretches image to fill container exactly
-- "fit": Aspect fit - scales to fit within container
+- "fit": Aspect fit - scales to fit within container (recommended for better padding)
 
 🖼️ IMAGE SOURCES:
 - Base64 Data URIs: "data:image/png;base64,..."
 - Remote URLs: "https://example.com/image.png"
 - Supported formats: PNG, JPEG, SVG, WebP
+
+💍 RING OPTIONS:
+- enabled: true/false - Show ring around selected image
+- width: number - Ring thickness in pixels (default: 2.0)
+- Ring color matches selectedIconColor
 
 🔒 SECURITY FEATURES:
 - HTTPS-only for remote URLs
@@ -372,6 +442,7 @@ TabsBar ImageIcon Feature Examples:
 - Loading state management
 - Automatic fallback to systemIcon
 - Retina/high-DPI support
+- Smaller icon size (24x24) with padding for better appearance
 
 🛡️ ERROR HANDLING:
 - Graceful fallback to systemIcon
@@ -380,7 +451,7 @@ TabsBar ImageIcon Feature Examples:
 - Unsupported format detection
 
 EXAMPLES:
-1. configureWithBase64Images() - Base64 encoded images
+1. configureWithBase64Images() - Base64 encoded images with rings
 2. configureWithRemoteImages() - Remote URL images
 3. configureWithMixedIconTypes() - Mixed icon types
 4. configureWithVariousFormats() - Different image formats
@@ -388,7 +459,9 @@ EXAMPLES:
 6. demonstrateLoadingStates() - Loading state management
 7. configureForHighDPI() - Retina display support
 8. demonstrateSecurityFeatures() - Security considerations
+9. configureWithRings() - Ring configuration examples
 
 All configurations include proper validation, caching, and fallback handling.
 Images load asynchronously with smooth transitions between states.
+Images now render properly without color tinting and include optional rings for selection.
 `);
