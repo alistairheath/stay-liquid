@@ -341,7 +341,7 @@ async function demonstrateSecurityFeatures() {
   });
 }
 
-// Example 9: Ring configuration for selected images
+// Example 9: Enhanced ring configuration with selected/unselected states
 async function configureWithRings() {
   await TabsBar.configure({
     items: [
@@ -374,13 +374,27 @@ async function configureWithRings() {
         }
       },
       {
+        id: 'thin-ring',
+        title: 'Thin Ring',
+        systemIcon: 'star',
+        imageIcon: {
+          shape: 'circle',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/34C759/FFFFFF?text=S',
+          ring: {
+            enabled: true,
+            width: 1.0
+          }
+        }
+      },
+      {
         id: 'no-ring',
         title: 'No Ring',
         systemIcon: 'triangle',
         imageIcon: {
-          shape: 'circle',
+          shape: 'square',
           size: 'fit',
-          image: 'https://via.placeholder.com/30x30/34C759/FFFFFF?text=N',
+          image: 'https://via.placeholder.com/30x30/FF9500/FFFFFF?text=N',
           ring: {
             enabled: false
           }
@@ -389,8 +403,8 @@ async function configureWithRings() {
     ],
     initialId: 'ring-enabled',
     visible: true,
-    selectedIconColor: '#FF3B30', // This color will be used for the ring
-    unselectedIconColor: '#8E8E93'
+    selectedIconColor: '#FF3B30', // Red ring for selected tabs
+    unselectedIconColor: '#8E8E93' // Gray ring for unselected tabs
   });
 }
 
@@ -425,10 +439,13 @@ TabsBar ImageIcon Feature Examples:
 - Remote URLs: "https://example.com/image.png"
 - Supported formats: PNG, JPEG, SVG, WebP
 
-💍 RING OPTIONS:
-- enabled: true/false - Show ring around selected image
+💍 ENHANCED RING OPTIONS:
+- enabled: true/false - Show rings around both selected and unselected images
 - width: number - Ring thickness in pixels (default: 2.0)
-- Ring color matches selectedIconColor
+- Selected ring color matches selectedIconColor
+- Unselected ring color matches unselectedIconColor
+- Transparent spacer ring between image and colored ring (same width as ring)
+- Additional 2px padding beneath the ring for better visual spacing
 
 🔒 SECURITY FEATURES:
 - HTTPS-only for remote URLs

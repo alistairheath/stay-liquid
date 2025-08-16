@@ -58,9 +58,9 @@ async function testSizeAndPadding() {
   console.log('✅ Image should be smaller (24x24) with padding');
 }
 
-// Test 3: Verify ring functionality
+// Test 3: Verify enhanced ring functionality
 async function testRingFeature() {
-  console.log('🧪 Testing ring feature...');
+  console.log('🧪 Testing enhanced ring feature...');
   
   await TabsBar.configure({
     items: [
@@ -94,15 +94,17 @@ async function testRingFeature() {
     ],
     initialId: 'ring-test',
     visible: true,
-    selectedIconColor: '#FF3B30' // This color should be used for the ring
+    selectedIconColor: '#FF3B30', // Red ring for selected tab
+    unselectedIconColor: '#8E8E93' // Gray ring for unselected tab
   });
   
-  console.log('✅ Selected tab should show ring, unselected should not');
+  console.log('✅ Selected tab should show red ring, unselected should show gray ring');
+  console.log('✅ Rings should have transparent spacer and 2px bottom padding');
 }
 
-// Test 4: Comprehensive test with all fixes
+// Test 4: Comprehensive test with all enhanced fixes
 async function testAllFixes() {
-  console.log('🧪 Testing all fixes together...');
+  console.log('🧪 Testing all enhanced fixes together...');
   
   await TabsBar.configure({
     items: [
@@ -132,7 +134,7 @@ async function testAllFixes() {
       },
       {
         id: 'fix3',
-        title: 'Padded',
+        title: 'Enhanced',
         systemIcon: 'heart',
         imageIcon: {
           shape: 'circle',
@@ -151,12 +153,84 @@ async function testAllFixes() {
     unselectedIconColor: '#8E8E93'
   });
   
-  console.log('✅ All fixes applied: no tinting, proper sizing, padding, and rings');
+  console.log('✅ All enhanced fixes applied: no tinting, proper sizing, padding, and dual-state rings');
+}
+
+// Test 5: Test different ring widths and configurations
+async function testRingVariations() {
+  console.log('🧪 Testing ring width variations...');
+  
+  await TabsBar.configure({
+    items: [
+      {
+        id: 'thin-ring',
+        title: 'Thin',
+        systemIcon: 'circle',
+        imageIcon: {
+          shape: 'circle',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/FF5733/FFFFFF?text=1',
+          ring: {
+            enabled: true,
+            width: 1.0
+          }
+        }
+      },
+      {
+        id: 'medium-ring',
+        title: 'Medium',
+        systemIcon: 'square',
+        imageIcon: {
+          shape: 'square',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/007AFF/FFFFFF?text=2',
+          ring: {
+            enabled: true,
+            width: 2.5
+          }
+        }
+      },
+      {
+        id: 'thick-ring',
+        title: 'Thick',
+        systemIcon: 'star',
+        imageIcon: {
+          shape: 'circle',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/34C759/FFFFFF?text=3',
+          ring: {
+            enabled: true,
+            width: 4.0
+          }
+        }
+      },
+      {
+        id: 'no-ring',
+        title: 'None',
+        systemIcon: 'triangle',
+        imageIcon: {
+          shape: 'square',
+          size: 'fit',
+          image: 'https://via.placeholder.com/30x30/FF9500/FFFFFF?text=4',
+          ring: {
+            enabled: false
+          }
+        }
+      }
+    ],
+    initialId: 'medium-ring',
+    visible: true,
+    selectedIconColor: '#FF3B30',
+    unselectedIconColor: '#8E8E93'
+  });
+  
+  console.log('✅ Ring variations: 1px, 2.5px, 4px, and no ring');
+  console.log('✅ Each should show appropriate spacer and padding');
 }
 
 // Run all tests
 export async function runImageFixTests() {
-  console.log('🚀 Starting image icon fix tests...\n');
+  console.log('🚀 Starting enhanced image icon fix tests...\n');
   
   try {
     await testImageDisplayFix();
@@ -171,13 +245,20 @@ export async function runImageFixTests() {
     await testAllFixes();
     console.log('');
     
-    console.log('🎉 All tests completed successfully!');
-    console.log('\nFixes implemented:');
+    await testRingVariations();
+    console.log('');
+    
+    console.log('🎉 All enhanced tests completed successfully!');
+    console.log('\nEnhanced fixes implemented:');
     console.log('✅ Images now use .withRenderingMode(.alwaysOriginal) to prevent color tinting');
     console.log('✅ Icon size reduced to 24x24 with 4px padding for better appearance');
-    console.log('✅ Ring feature added with configurable width and selectedIconColor');
+    console.log('✅ Enhanced ring feature with dual-state support:');
+    console.log('   • Selected tabs show ring in selectedIconColor');
+    console.log('   • Unselected tabs show ring in unselectedIconColor');
+    console.log('   • Transparent spacer ring between image and colored ring');
+    console.log('   • Additional 2px padding beneath rings');
     console.log('✅ TypeScript definitions updated with ImageIconRing interface');
-    console.log('✅ Example files updated to demonstrate new features');
+    console.log('✅ Example files updated to demonstrate enhanced features');
     
   } catch (error) {
     console.error('❌ Test failed:', error);
@@ -189,14 +270,15 @@ export {
   testImageDisplayFix,
   testSizeAndPadding,
   testRingFeature,
-  testAllFixes
+  testAllFixes,
+  testRingVariations
 };
 
 // Usage instructions
 console.log(`
 Image Icon Fixes Test Suite:
 
-ISSUES FIXED:
+ENHANCED ISSUES FIXED:
 1. 🎨 Image Display: Images were being tinted by selectedIconColor/unselectedIconColor
    - Fixed by using .withRenderingMode(.alwaysOriginal)
    
@@ -204,9 +286,12 @@ ISSUES FIXED:
    - Reduced from 30x30 to 24x24 pixels
    - Added 4px padding around images in 'fit' mode
    
-3. 💍 Ring Feature: Added optional ring around selected images
+3. 💍 Enhanced Ring Feature: Added dual-state rings around images
+   - Selected tabs show ring in selectedIconColor
+   - Unselected tabs show ring in unselectedIconColor
+   - Transparent spacer ring between image and colored ring (same width as ring)
+   - Additional 2px padding beneath rings for better visual spacing
    - Configurable width (default: 2.0px)
-   - Uses selectedIconColor for ring color
    - Can be enabled/disabled per image
 
 USAGE:
@@ -216,6 +301,7 @@ runImageFixTests();
 Or run individual tests:
 - testImageDisplayFix() - Test color tinting fix
 - testSizeAndPadding() - Test size and padding improvements
-- testRingFeature() - Test ring functionality
-- testAllFixes() - Test all fixes together
+- testRingFeature() - Test enhanced ring functionality
+- testAllFixes() - Test all enhanced fixes together
+- testRingVariations() - Test different ring widths and configurations
 `);

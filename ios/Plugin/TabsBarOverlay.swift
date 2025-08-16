@@ -154,10 +154,13 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
           loadImageIcon(imageIcon) { [weak self] image in
               DispatchQueue.main.async {
                   if let image = image {
-                      // Use original rendering mode to preserve image content
-                      tabBarItem.image = image.withRenderingMode(.alwaysOriginal)
-                      // Store reference to original image for ring rendering
-                      tabBarItem.selectedImage = self?.createSelectedImageWithRing(image, imageIcon: imageIcon)
+                      // Create unselected image with ring (if enabled)
+                      let unselectedImage = self?.createUnselectedImageWithRing(image, imageIcon: imageIcon) ?? image
+                      tabBarItem.image = unselectedImage.withRenderingMode(.alwaysOriginal)
+                      
+                      // Create selected image with ring (if enabled)
+                      let selectedImage = self?.createSelectedImageWithRing(image, imageIcon: imageIcon) ?? image
+                      tabBarItem.selectedImage = selectedImage.withRenderingMode(.alwaysOriginal)
                   } else {
                       // Fallback to systemIcon if imageIcon fails
                       self?.loadFallbackImage(for: model, tabBarItem: tabBarItem)
@@ -223,13 +226,29 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
     /// - Returns: Image with ring for selected state, or original image
     private func createSelectedImageWithRing(_ image: UIImage, imageIcon: ImageIcon) -> UIImage {
         guard let ring = imageIcon.ring, ring.enabled else {
-            return image.withRenderingMode(.alwaysOriginal)
+            return image
         }
         
         let ringWidth = CGFloat(ring.width ?? 2.0)
         let selectedColor = selectedIconColor ?? UIColor.systemBlue
         
-        return ImageUtils.addRingToImage(image, ringWidth: ringWidth, ringColor: selectedColor)
+        return ImageUtils.addEnhancedRingToImage(image, ringWidth: ringWidth, ringColor: selectedColor)
+    }
+    
+    /// Creates an unselected image with ring if configured
+    /// - Parameters:
+    ///   - image: The base image
+    ///   - imageIcon: The image icon configuration
+    /// - Returns: Image with ring for unselected state, or original image
+    private func createUnselectedImageWithRing(_ image: UIImage, imageIcon: ImageIcon) -> UIImage {
+        guard let ring = imageIcon.ring, ring.enabled else {
+            return image
+        }
+        
+        let ringWidth = CGFloat(ring.width ?? 2.0)
+        let unselectedColor = unselectedIconColor ?? UIColor.systemGray
+        
+        return ImageUtils.addEnhancedRingToImage(image, ringWidth: ringWidth, ringColor: unselectedColor)
     }
     
     /// Image utilities for loading and processing images
@@ -501,24 +520,49 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
             loadingStates.removeAll()
         }
         
-        /// Adds a ring around an image
+        /// Adds an enhanced ring around an image with transparent spacer and padding
         /// - Parameters:
         ///   - image: The source image
-        ///   - ringWidth: Width of the ring
+        ///   - ringWidth: Width of the colored ring
         ///   - ringColor: Color of the ring
-        /// - Returns: Image with ring added
-        static func addRingToImage(_ image: UIImage, ringWidth: CGFloat, ringColor: UIColor) -> UIImage {
+        /// - Returns: Image with enhanced ring added
+        static func addEnhancedRingToImage(_ image: UIImage, ringWidth: CGFloat, ringColor: UIColor) -> UIImage {
             let size = image.size
-            let newSize = CGSize(width: size.width + ringWidth * 2, height: size.height + ringWidth * 2)
+            let spacerWidth = ringWidth // Transparent spacer same width as ring
+            let bottomPadding: CGFloat = 2.0 // Additional padding beneath the ring
+            
+            // Calculate total size: image + spacer + ring + bottom padding
+            let totalRingSpace = spacerWidth + ringWidth
+            let newSize = CGSize(
+                width: size.width + totalRingSpace * 2,
+                height: size.height + totalRingSpace * 2 + bottomPadding
+            )
             
             UIGraphicsBeginImageContextWithOptions(newSize, false, 0)
             let context = UIGraphicsGetCurrentContext()
             
-            // Draw the ring
+            // Draw the original image in the center (accounting for spacer and ring)
+            let imageRect = CGRect(
+                x: totalRingSpace,
+                y: totalRingSpace,
+                width: size.width,
+                height: size.height
+            )
+            image.draw(in: imageRect)
+            
+            // Draw the transparent spacer ring (invisible, just for spacing)
+            // This creates the gap between image and colored ring
+            
+            // Draw the colored ring
             context?.setStrokeColor(ringColor.cgColor)
             context?.setLineWidth(ringWidth)
-            let ringRect = CGRect(x: ringWidth/2, y: ringWidth/2,
-                                width: size.width + ringWidth, height: size.height + ringWidth)
+            
+            let ringRect = CGRect(
+                x: ringWidth/2,
+                y: ringWidth/2,
+                width: newSize.width - ringWidth,
+                height: newSize.height - ringWidth - bottomPadding
+            )
             
             if image.size.width == image.size.height {
                 // Circular ring for square images
@@ -530,14 +574,20 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
                 context?.strokePath()
             }
             
-            // Draw the original image in the center
-            let imageRect = CGRect(x: ringWidth, y: ringWidth, width: size.width, height: size.height)
-            image.draw(in: imageRect)
-            
             let newImage = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             
             return newImage?.withRenderingMode(.alwaysOriginal) ?? image
+        }
+        
+        /// Legacy function for backward compatibility
+        /// - Parameters:
+        ///   - image: The source image
+        ///   - ringWidth: Width of the ring
+        ///   - ringColor: Color of the ring
+        /// - Returns: Image with ring added
+        static func addRingToImage(_ image: UIImage, ringWidth: CGFloat, ringColor: UIColor) -> UIImage {
+            return addEnhancedRingToImage(image, ringWidth: ringWidth, ringColor: ringColor)
         }
     }
     
