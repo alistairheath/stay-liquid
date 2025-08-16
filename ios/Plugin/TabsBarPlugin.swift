@@ -391,6 +391,14 @@ private struct JSImageIcon: Decodable {
     let size: String
     /// Image source - either base64 data URI or HTTP/HTTPS URL
     let image: String
+    /// Optional ring configuration
+    let ring: JSImageIconRing?
+}
+
+/// Represents the ring configuration for an image icon
+private struct JSImageIconRing: Decodable {
+    let enabled: Bool
+    let width: Double
 }
 
 /// Represents a tab item as received from JavaScript
@@ -510,9 +518,14 @@ public class TabsBarPlugin: CAPPlugin {
             }()
 
             // Convert JSImageIcon to ImageIcon if present
-            let imageIcon: ImageIcon? = js.imageIcon.map { jsImageIcon in
-                ImageIcon(shape: jsImageIcon.shape, size: jsImageIcon.size, image: jsImageIcon.image)
-            }
+          let imageIcon: ImageIcon? = js.imageIcon.map { jsImageIcon in
+              ImageIcon(
+                  shape: jsImageIcon.shape,
+                  size: jsImageIcon.size,
+                  image: jsImageIcon.image,
+                  ring: jsImageIcon.ring.map { ImageIconRing(enabled: $0.enabled, width: $0.width) }
+              )
+          }
             
             return TabsBarItem(
                 id: js.id,
