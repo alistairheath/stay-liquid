@@ -42,7 +42,6 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
             tabBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tabBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tabBar.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            tabBar.heightAnchor.constraint(equalToConstant: 49) // Standard tab bar height
         ])
     }
 
