@@ -91,7 +91,7 @@ Then in you class add an `ionViewDidEnter()`  method that initiates the Liquid G
 👀 If you are using Ionic’s tabs for other platforms, you can use the above useNativeTabs attribute to hide them on iOS 26+.
 
 ```html
-<ion-tabs [class.hidden]="keyboardVisible || useNativeTabs">
+<ion-tabs [class.hidden]="useNativeTabs">
     ... Tabs content here
 </ion-tabs>   
 ```
