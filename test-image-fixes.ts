@@ -86,9 +86,7 @@ async function testRingFeature() {
           shape: 'square',
           size: 'fit',
           image: 'https://via.placeholder.com/30x30/007AFF/FFFFFF?text=NO',
-          ring: {
-            enabled: false
-          }
+          // ring is optional, so we can omit it entirely if no ring is desired
         }
       }
     ],
@@ -136,15 +134,7 @@ async function testAllFixes() {
         id: 'fix3',
         title: 'Enhanced',
         systemIcon: 'heart',
-        imageIcon: {
-          shape: 'circle',
-          size: 'fit',
-          image: 'https://via.placeholder.com/40x40/34C759/FFFFFF?text=3',
-          ring: {
-            enabled: true,
-            width: 1.5
-          }
-        }
+        // imageIcon is optional, so we can omit it entirely
       }
     ],
     initialId: 'fix1',
@@ -212,9 +202,7 @@ async function testRingVariations() {
           shape: 'square',
           size: 'fit',
           image: 'https://via.placeholder.com/30x30/FF9500/FFFFFF?text=4',
-          ring: {
-            enabled: false
-          }
+          // ring is optional, so we can omit it entirely
         }
       }
     ],

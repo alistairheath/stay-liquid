@@ -27,7 +27,7 @@ struct TabsBarItem {
     /// Optional title displayed under the icon
     let title: String?
     /// Optional system icon name (SF Symbol) - used as fallback
-    let systemIcon: String?
+    let systemIcon: String
     /// Optional custom image asset name
     let image: String?
     /// Optional enhanced image icon configuration
@@ -163,28 +163,17 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
                       tabBarItem.selectedImage = selectedImage.withRenderingMode(.alwaysOriginal)
                   } else {
                       // Fallback to systemIcon if imageIcon fails
-                      self?.loadFallbackImage(for: model, tabBarItem: tabBarItem)
+                      tabBarItem.image = UIImage(systemName: model.systemIcon) ?? UIImage()
                   }
               }
           }
           return
       }
       
-      // Priority 2: systemIcon (SF Symbols)
-      if let systemIconName = model.systemIcon {
-          let image = UIImage(systemName: systemIconName) ?? UIImage()
-          tabBarItem.image = image
-          return
-      }
-      
-      // Priority 3: image (bundled asset)
-      if let assetName = model.image {
-          tabBarItem.image = UIImage(named: assetName)
-          return
-      }
-      
-      // Priority 4: placeholder (empty image)
-      tabBarItem.image = UIImage()
+      // Priority 2: systemIcon (SF Symbols) - now compulsory
+      let image = UIImage(systemName: model.systemIcon) ?? UIImage()
+      tabBarItem.image = image
+      return
   }
   
   /// Loads fallback image when imageIcon fails
@@ -192,13 +181,8 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
   ///   - model: The tab item model
   ///   - tabBarItem: The UITabBarItem to update
   func loadFallbackImage(for model: TabsBarItem, tabBarItem: UITabBarItem) {
-      if let systemIconName = model.systemIcon {
-          tabBarItem.image = UIImage(systemName: systemIconName) ?? UIImage()
-      } else if let assetName = model.image {
-          tabBarItem.image = UIImage(named: assetName)
-      } else {
-          tabBarItem.image = UIImage()
-      }
+      // systemIcon is now compulsory, so it's always the fallback
+      tabBarItem.image = UIImage(systemName: model.systemIcon) ?? UIImage()
   }
   
   /// Loads an image icon using the ImageUtils
@@ -226,7 +210,7 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
     /// - Returns: Image with ring for selected state, or original image
     private func createSelectedImageWithRing(_ image: UIImage, imageIcon: ImageIcon) -> UIImage {
         guard let ring = imageIcon.ring, ring.enabled else {
-            return image
+            return image // No ring if not enabled
         }
         
         let ringWidth = CGFloat(ring.width ?? 2.0)
@@ -242,7 +226,7 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
     /// - Returns: Image with ring for unselected state, or original image
     private func createUnselectedImageWithRing(_ image: UIImage, imageIcon: ImageIcon) -> UIImage {
         guard let ring = imageIcon.ring, ring.enabled else {
-            return image
+            return image // No ring if not enabled
         }
         
         let ringWidth = CGFloat(ring.width ?? 2.0)

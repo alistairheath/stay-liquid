@@ -17,7 +17,7 @@ async function configureWithBase64Images() {
       {
         id: 'home',
         title: 'Home',
-        systemIcon: 'house', // Fallback if imageIcon fails
+        systemIcon: 'house',
         imageIcon: {
           shape: 'circle',
           size: 'fit',
@@ -46,14 +46,8 @@ async function configureWithBase64Images() {
         id: 'profile',
         title: 'Profile',
         systemIcon: 'person',
-        imageIcon: {
-          shape: 'circle',
-          size: 'fit',
-          image: greenPixel,
-          ring: {
-            enabled: false
-          }
-        }
+        // imageIcon is optional, so we can omit it entirely if no custom image is needed
+        // ring is optional, so we can omit it entirely if no ring is desired
       }
     ],
     initialId: 'home',
@@ -70,7 +64,7 @@ async function configureWithRemoteImages() {
       {
         id: 'dashboard',
         title: 'Dashboard',
-        systemIcon: 'chart.bar', // Fallback for failed remote load
+        systemIcon: 'chart.bar',
         imageIcon: {
           shape: 'square',
           size: 'cover',
@@ -92,11 +86,7 @@ async function configureWithRemoteImages() {
         id: 'settings',
         title: 'Settings',
         systemIcon: 'gear',
-        imageIcon: {
-          shape: 'square',
-          size: 'stretch',
-          image: 'https://via.placeholder.com/30x30/34C759/FFFFFF?text=S'
-        }
+        // imageIcon is optional
       }
     ],
     initialId: 'dashboard',
@@ -113,7 +103,7 @@ async function configureWithMixedIconTypes() {
       {
         id: 'tab1',
         title: 'Image Icon',
-        systemIcon: 'star', // Fallback
+        systemIcon: 'star',
         imageIcon: {
           shape: 'circle',
           size: 'cover',
@@ -123,13 +113,13 @@ async function configureWithMixedIconTypes() {
       {
         id: 'tab2',
         title: 'System Icon',
-        systemIcon: 'heart' // Uses SF Symbol
+        systemIcon: 'heart'
       },
       {
         id: 'tab3',
         title: 'Asset Image',
-        image: 'custom-icon', // Uses bundled asset
-        systemIcon: 'square' // Fallback if asset not found
+        image: 'custom-icon',
+        systemIcon: 'square'
       }
     ],
     initialId: 'tab1',
@@ -196,7 +186,7 @@ async function configureWithErrorHandling() {
       {
         id: 'invalid-url',
         title: 'Invalid URL',
-        systemIcon: 'xmark.circle', // Will fallback to this
+        systemIcon: 'xmark.circle',
         imageIcon: {
           shape: 'square',
           size: 'cover',
@@ -206,7 +196,7 @@ async function configureWithErrorHandling() {
       {
         id: 'invalid-base64',
         title: 'Invalid Base64',
-        systemIcon: 'exclamationmark.triangle', // Will fallback to this
+        systemIcon: 'exclamationmark.triangle',
         imageIcon: {
           shape: 'circle',
           size: 'fit',
@@ -216,11 +206,11 @@ async function configureWithErrorHandling() {
       {
         id: 'unsupported-format',
         title: 'Unsupported',
-        systemIcon: 'questionmark.circle', // Will fallback to this
+        systemIcon: 'questionmark.circle',
         imageIcon: {
           shape: 'square',
           size: 'cover',
-          image: 'https://example.com/image.bmp' // BMP not supported
+          image: 'https://example.com/image.bmp'
         }
       }
     ],
@@ -316,7 +306,7 @@ async function demonstrateSecurityFeatures() {
       {
         id: 'cors-blocked',
         title: 'CORS Blocked',
-        systemIcon: 'shield.slash', // Will fallback to this
+        systemIcon: 'shield.slash',
         imageIcon: {
           shape: 'square',
           size: 'fit',
@@ -391,13 +381,12 @@ async function configureWithRings() {
         id: 'no-ring',
         title: 'No Ring',
         systemIcon: 'triangle',
+        // imageIcon is optional, and ring is optional within imageIcon
+        // so we can omit the ring property entirely if no ring is desired
         imageIcon: {
           shape: 'square',
           size: 'fit',
           image: 'https://via.placeholder.com/30x30/FF9500/FFFFFF?text=N',
-          ring: {
-            enabled: false
-          }
         }
       }
     ],
