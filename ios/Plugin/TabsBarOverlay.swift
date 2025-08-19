@@ -414,7 +414,7 @@ final class TabsBarOverlay: UIViewController, UITabBarDelegate {
         private static func applyImageIconStyling(_ image: UIImage?, shape: String, size: String) -> UIImage? {
             guard let image = image else { return nil }
             
-            let targetSize = CGSize(width: 24, height: 24) // Smaller icon size with padding
+            let targetSize = CGSize(width: 20, height: 20) // Smaller icon size with padding
             
             // Apply size behavior
             let resizedImage: UIImage
