@@ -1,4 +1,5 @@
 import UIKit
+import JSModels // Import the new JSModels file
 
 /// Utility class for image loading, validation, and caching
 class ImageUtils {

@@ -1,6 +1,9 @@
 import SwiftUI
 import UIKit
 import Foundation
+import JSModels // Import the new JSModels file
+import ImageUtils // Import the new ImageUtils file
+import ColorUtils // Import the new ColorUtils file
 
 /// Represents an image icon configuration
 struct ImageIcon {

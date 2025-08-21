@@ -1,7 +1,47 @@
 import Capacitor
 import UIKit
-import SwiftUI // Import SwiftUI
-import Foundation // For JSONSerialization
+import SwiftUI
+import Foundation
+import JSModels // Import the new JSModels file
+import ImageUtils // Import the new ImageUtils file
+import ColorUtils // Import the new ColorUtils file
+
+/// Represents a tab item as received from JavaScript
+private struct JSItem: Decodable {
+    /// Unique identifier for the tab
+    let id: String
+    /// Optional title displayed under the icon
+    let title: String?
+    /// Optional system icon name (SF Symbol)
+    let systemIcon: String?
+    /// Optional custom image asset name
+    let image: String?
+    /// Optional enhanced image icon configuration
+    let imageIcon: JSImageIcon?
+    /// Optional badge value for the tab
+    let badge: JSBadge?
+}
+
+/// Represents different types of badges that can be received from JavaScript
+private enum JSBadge: Decodable {
+    /// Numeric badge value
+    case number(Int)
+    /// Dot badge (typically used for notifications)
+    case dot
+    /// No badge
+    case null
+
+    /// Initializes a JSBadge from a decoder
+    /// - Parameter decoder: The decoder to use
+    /// - Throws: Decoding errors if the value cannot be decoded
+    init(from decoder: Decoder) throws {
+        let c = try decoder.singleValueContainer()
+        if c.decodeNil() { self = .null; return }
+        if let s = try? c.decode(String.self), s == "dot" { self = .dot; return }
+        if let n = try? c.decode(Int.self) { self = .number(n); return }
+        self = .null
+    }
+}
 
 /// Plugin for managing Liquid Glass tab bar overlays in Ionic applications
 @objc(TabsBarPlugin)
