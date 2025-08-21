@@ -530,7 +530,7 @@ public class TabsBarPlugin: CAPPlugin {
             return TabsBarItem(
                 id: js.id,
                 title: js.title,
-                systemIcon: js.systemIcon,
+                systemIcon: js.systemIcon!,
                 image: js.image,
                 imageIcon: imageIcon,
                 badge: badge
